@@ -17,7 +17,7 @@ class BaseSpeech:
             session_attributes = {}
 
         # 最終的に返却するレスポンス内容。(dict)
-        # 各メソッドで上書き・修正していく(結構乱暴な実装というか、ライブラリが提供さｒていない)
+        # 各メソッドで上書き・修正していく(結構乱暴な実装というか、ライブラリが提供されていない)
         self._response = {
             'version': '1.0',
             'sessionAttributes': session_attributes,
