@@ -1,7 +1,8 @@
 # Alexa 用 AWS Lambda関数
 '''
-Alexa 発話基底クラス
+FunGreeting (たのしい挨拶)　クラス
 '''
+import datetime
 class BaseSpeech:
     '''
     constructor
@@ -87,18 +88,31 @@ class QuestionSpeech(BaseSpeech):
         self._response['response']['reprompt'] = reprompt
         return self
 
-# こんにちは
-def hello():
-    return OneSpeech('こんにちは').build()
-
-# 「ようこそ」といって返事をまつ
+# 最初の挨拶
 def welcome():
-    # repromptは返答がないときに付与する言葉。
-    return QuestionSpeech('ようこそ!').reprompt('よく聞こえませんでした').build()
+    text = "挨拶を聞きたいときは「挨拶の言葉をお願いします」,終わりたいときは「おしまい」と言ってください。どうしますか？"
+    return QuestionSpeech(text).reprompt('よく聞こえませんでした').build()
 
-# さようなら
+# 時間によって挨拶を変更する
+def greeting():
+    # 現在の時刻を取得する
+    hour = datetime.datetime.now().hour
+    if(5 <= hour and hour <= 6):
+        greet = "朝早いですね、おはようございます。アレクサスキルゼミの参加者のみなさん";
+    elif(7 <= hour and hour <= 11):
+        greet = "おはようございます,アレクサスキルゼミの参加者のみなさん。";
+    elif(12 <= hour and hour <=18):
+        greet = "こんにちは,アレクサスキルゼミの参加者のみなさん";
+    elif(19 <= hour and hour <= 0):
+         greet = "こんばんわ,アレクサスキルゼミの参加者のみなさん";
+    else:
+        greet = "夜遅くにこんばんわ,アレクサスキルゼミの参加者のみなさん";
+    return OneSpeech(greet).build()
+
+# かえりぎわの挨拶
 def bye():
-    return OneSpeech('さようなら').build()
+    text = "ご利用ありがとうございます。本日もあなたにとって良い日であることを願います"
+    return OneSpeech(text).build()
 
 # Lambdaのmain関数
 def lambda_handler(event, context):
