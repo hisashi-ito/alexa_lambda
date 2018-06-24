@@ -106,11 +106,16 @@ var handlers = {
 // 夜:   19~0時台    「こんばんわ」
 // 深夜: 1~4時台     「夜遅くにこんばんわ」
 //
+// 注意) AWS のLambda のTimezoneを Asia/Tokyo に変更する場合は
+//      https://qiita.com/nullian/items/39ecf1f6d0194b72e8e6
+//      環境変数の設定で以下を設定する。
+//      key: TZ, Value: Asia/Tokyo
 function getGreeting(){
     // なんかLambdaの時刻がずれているので修正する
-    var timezoneoffset = -9;
-    var dt = new Date(Date.now() - (timezoneoffset * 60 - new Date().getTimezoneOffset()) * 60000);
-    //var dt = new Date();
+    // var timezoneoffset = -9;
+    //　var dt = new Date(Date.now()) - (timezoneoffset * 60 - new Date().getTimezoneOffset()) * 60000);
+    // AWS LambdaのTZの修正を実施したのでここのコードはもとに戻す。
+    var dt = new Date();
     var hours = dt.getUTCHours();
     var greet = undefined;
     if(5 <= hours && hours <= 6){
