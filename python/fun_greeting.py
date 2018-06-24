@@ -1,4 +1,4 @@
-# Alexa 用 AWS Lambda関数
+python/fun_greeting.py# Alexa 用 AWS Lambda関数
 '''
 FunGreeting (たのしい挨拶)　クラス
 '''
@@ -98,15 +98,15 @@ def greeting():
     # 現在の時刻を取得する
     hour = datetime.datetime.now().hour
     if(5 <= hour and hour <= 6):
-        greet = "朝早いですね、おはようございます。アレクサスキルゼミの参加者のみなさん";
+        greet = "朝早いですね、おはようございます。アレクサスキルゼミの参加者のみなさん"
     elif(7 <= hour and hour <= 11):
-        greet = "おはようございます,アレクサスキルゼミの参加者のみなさん。";
+        greet = "おはようございます,アレクサスキルゼミの参加者のみなさん。"
     elif(12 <= hour and hour <=18):
-        greet = "こんにちは,アレクサスキルゼミの参加者のみなさん";
+        greet = "こんにちは,アレクサスキルゼミの参加者のみなさん"
     elif(19 <= hour and hour <= 0):
-         greet = "こんばんわ,アレクサスキルゼミの参加者のみなさん";
+         greet = "こんばんわ,アレクサスキルゼミの参加者のみなさん"
     else:
-        greet = "夜遅くにこんばんわ,アレクサスキルゼミの参加者のみなさん";
+        greet = "夜遅くにこんばんわ,アレクサスキルゼミの参加者のみなさん"
     return OneSpeech(greet).build()
 
 # かえりぎわの挨拶
