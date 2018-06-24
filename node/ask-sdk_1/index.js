@@ -14,7 +14,7 @@
 // https://developer.amazon.com/ja/blogs/alexa/post/51f6f6eb-a6cb-4d2e-82ca-166bdfee61be/ask-sdk-v2-release-japanese
 // 重要）SDK1で記載するには以下のアダプターを利用する必要がある。
 // var Alexa = require('alexa-sdk');
-var Alexa = require('ask-sdk-v1adapter');
+const Alexa = require('ask-sdk-v1adapter');
 
 //Replace with your app ID (OPTIONAL).  You can find this value at the top of your skill's page on http://developer.amazon.com.  
 //Make sure to enclose your value in quotes, like this: var APP_ID = "amzn1.ask.skill.bb4045e6-b3e8-4133-b650-72923c5980f1";
