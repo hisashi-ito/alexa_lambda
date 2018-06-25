@@ -111,12 +111,12 @@ var handlers = {
 //      環境変数の設定で以下を設定する。
 //      key: TZ, Value: Asia/Tokyo
 function getGreeting(){
-    // なんかLambdaの時刻がずれているので修正する
-    // var timezoneoffset = -9;
-    //　var dt = new Date(Date.now()) - (timezoneoffset * 60 - new Date().getTimezoneOffset()) * 60000);
     // AWS LambdaのTZの修正を実施したのでここのコードはもとに戻す。
-    var dt = new Date();
-    var hours = dt.getUTCHours();
+    // var dt = new Date();
+    // なんかLambdaの時刻がずれているので修正する
+    var timezoneoffset = -9;
+    var fakeUTC = new Date(Date.now() - (timezoneoffset * 60 - new Date().getTimezoneOffset()) * 60000);
+    var hours = fakeUTC.getHours();
     var greet = undefined;
     if(5 <= hours && hours <= 6){
         // 早朝
