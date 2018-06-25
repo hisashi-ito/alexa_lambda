@@ -1,4 +1,8 @@
 ## Alexa のための AWS Lambda 関数例
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/8604827/41828997-42924ad8-7873-11e8-9e10-3e4bb5f856c7.png" width="400px">
+</p>
 Alexaのシステムのために利用するAWSのLambda関数の例を示します。例として提供するのは以下の種別です  
 
 #### 実装するLambda
