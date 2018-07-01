@@ -1,22 +1,26 @@
 //
-// 【AnimeEvent lambda】
+// 【AnimeTalkEvent lambda】
 //
-//  概要: アニメイベントお知らせAlexaスキルで利用するためのlambda関数
+//  概要: アニメトークイベントお知らせAlexaスキルで利用するためのlambda関数
+//　　　　 githubで公開しているのでApplicationIDは環境変数経由で設定すること。
 //
+//  更新履歴:
+//          2018.07.01 新規作成  
 //
 'use strict';
 const Alexa = require('ask-sdk-v1adapter');
 var export_function = require('scraping.js');
-var APP_ID = undefined;
-var SKILL_NAME = "アニメイベントお知らせ";
-var LUNCH_MESSAGE = "アニメイベントお知らせスキルへようこそ。\
-このスキルではあなたの興味のあるアニメイベントをチェックできます。\
-アニメイベントを聞きますか？";
-var HELP_MESSAGE = "挨拶を聞きたいときは「挨拶の言葉をお願いします」,終わりたいときは「おしまい」と言ってください。どうしますか？"
+var APP_ID = process.env.APP_ID // 注意) APP_ID はlambdaの環境変数経由でセットする
+var SKILL_NAME = "アニメトークイベントお知らせ";
+var LUNCH_MESSAGE = "アニメトークイベントお知らせスキルへようこそ。\
+このスキルではあなたの興味のあるアニメトークイベントをチェックできます。\
+予定されているアニメトークイベントを知りたいですか？";
+var HELP_MESSAGE = "アニメトークイベント情報を知りたい場合は、\
+「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。";
 var HELP_REPROMPT = "どうしますか？";
-var STOP_MESSAGE = "ご利用ありがとうございます。本日もあなたにとって良い日であることを願います";
+var STOP_MESSAGE = "ご利用ありがとうございます。スキルを終了します。";
 
-// このハンドラはAWSのLambdaのハンドラーです。
+// AWSのLambdaのハンドラー
 //
 // ハンドラってなに？
 // --

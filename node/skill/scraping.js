@@ -42,11 +42,11 @@ const NG_KEYWORDS = [
     "エロ","18禁","sex","アダルト"
 ];
 
+/*
 loft("http://www.loft-prj.co.jp/schedule/lofta").then(function(ret){
     console.log(ret);
   }
 );
-/*
 loft("http://www.loft-prj.co.jp/schedule/plusone").then(function(ret){
     console.log(ret);
   }
