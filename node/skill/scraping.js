@@ -35,7 +35,7 @@ const KEYWORDS = [
     "プロデューサー","bd-box",
     "ブルーレイ","blue-ray","box",
     "blue","blueray","dvd",
-    "発売記念"
+    "発売記念","イラスト","絵師"
 ];
 // NGワード
 const NG_KEYWORDS = [
