@@ -43,43 +43,29 @@ const NG_KEYWORDS = [
     "エロ","18禁","sex","アダルト"
 ];
 
-/*
-loft("http://www.loft-prj.co.jp/schedule/lofta").then(function(ret){
-    console.log(ret);
-  }
-);
-loft("http://www.loft-prj.co.jp/schedule/plusone").then(function(ret){
-    console.log(ret);
-  }
-);
-*/
-
-event_search();
-
-// イベント抽出
+// イベント情報抽出
 function event_search(){
     var event = {};
-    async.series([
+    async.parallel([
         function(callback){
             loft("http://www.loft-prj.co.jp/schedule/lofta").then(function(ret){
-                console.log("1");
                 event["阿佐ヶ谷ロフト"] = JSON.parse(JSON.stringify(ret));
+                callback(null, null);
             })
         },
         function(callback){
-            console.log("2");
             loft("http://www.loft-prj.co.jp/schedule/plusone").then(function(ret){
                 event["ロフトプラスワン"] = JSON.parse(JSON.stringify(ret));
+                callback(null, null);
             })
         }
     ],
     function complete(err, results){
-        console.log("3");
         return event;
     });
 }
-// URL毎の個別のスクレイピン関数
-// ロフトWEB
+
+// ロフトの情報抽出関数
 function loft(url){
     // 時刻情報の取得
     var utime = new Date().getTime();
