@@ -1,3 +1,5 @@
+import { S_IFLNK } from 'constants';
+
 //
 // 【AnimeTalkEvent lambda】
 //
@@ -6,10 +8,11 @@
 //
 //  更新履歴:
 //          2018.07.01 新規作成  
+//          2018.07.07 開発中
 //
 'use strict';
 const Alexa = require('ask-sdk-v1adapter');
-var export_function = require('./scraping.js');
+var scraping = require('./scraping.js');
 var APP_ID = process.env.APP_ID // 注意) APP_ID はlambdaの環境変数経由でセットする
 var SKILL_NAME = "アニメトークイベントお知らせ";
 var LUNCH_MESSAGE = "アニメトークイベントお知らせスキルへようこそ。\
@@ -19,6 +22,8 @@ var HELP_MESSAGE = "アニメトークイベント情報を知りたい場合は
 「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。";
 var HELP_REPROMPT = "どうしますか？";
 var STOP_MESSAGE = "ご利用ありがとうございました。スキルを終了します。";
+// スクレイピングを再実行する時間24時間経過したら再取得する。
+var INTERVAL_TIME = 86400;
 
 // AWSのLambdaのハンドラー
 //
@@ -75,6 +80,12 @@ var handlers = {
     },
     // アニメトークイベントインテント
     'AnimeTalkEventInetnt': function(){
+        // 現在時間情報
+        var date = new Date() ;
+        var x = date.getTime();
+        var utime = Math.floor(x/1000);       
+        var event = undefined;
+
         if(this.handler.state === undefined){
             // ステートを設定(一度説明を聞いた場合)
             this.handler.state = states.SEARCHMODE;
@@ -85,12 +96,32 @@ var handlers = {
             this.handler.state = stats.FINISH;
             // 作成済みのevent情報が存在するか確認
             if(this.attributes['event']){
-                
+                if((utime - this.attributes["time"]) > INTERVAL_TIME){
+                    // データを取得してから24時間経過した場合,検索結果を再取得する
+                    event = scraping.event_search();
+                }else{
+                    // データを取得してから24時間経過していない場合は保存されているデータを利用する
+                    event = this.attributes['event'];
+                };
             }else{
-                // 検索して保存
-                var event = ;
+                // イベント情報を取得
+                event = scraping.event_search();
+                this.attributes['event'] = event;
+                this.attributes['time'] = utime;
             };
-
+            // event 情報の読み上げ文字列を作成
+            var msg = "";
+            for(key in event){
+                var place = key;
+                var msg = place + "の情報をお知らせします。\n"
+                var ary = event[place];
+                for(var i = 0; i < ary.length; i++){
+                    msg = msg + ary[0] + "\n" + ary[1];
+                }
+            }
+            this.emit(':tell',msg);
+            // statusを完了に変更
+            this.handler.state = stats.FINISH;
         }else if(this.handler.state === stats.FINISH){
             // 終了の言葉を創出
             this.emit('SessionEndedRequest')
@@ -118,6 +149,7 @@ var handlers = {
     'AMAZON.StopIntent': function () {
         this.emit(':tell', STOP_MESSAGE);
     },
+
     // スキルを終了するときに呼ばれるインテント
     'SessionEndedRequest': function () {
 	this.emit(':tell', STOP_MESSAGE);  
