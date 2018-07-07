@@ -13,12 +13,12 @@ var export_function = require('scraping.js');
 var APP_ID = process.env.APP_ID // 注意) APP_ID はlambdaの環境変数経由でセットする
 var SKILL_NAME = "アニメトークイベントお知らせ";
 var LUNCH_MESSAGE = "アニメトークイベントお知らせスキルへようこそ。\
-このスキルではあなたの興味のあるアニメトークイベントをチェックできます。\
+このスキルではアニメトークイベントをチェックできます。\
 予定されているアニメトークイベントを知りたいですか？";
 var HELP_MESSAGE = "アニメトークイベント情報を知りたい場合は、\
 「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。";
 var HELP_REPROMPT = "どうしますか？";
-var STOP_MESSAGE = "ご利用ありがとうございます。スキルを終了します。";
+var STOP_MESSAGE = "ご利用ありがとうございました。スキルを終了します。";
 
 // AWSのLambdaのハンドラー
 //
@@ -49,31 +49,54 @@ exports.handler = function(event, context, callback) {
     alexa.execute();
 };
 
+// 大域変数を利用して内部状態を管理するためにSTATEを利用します
+// his.handler.state へ保存できる。
+// STARTMODE:  初回起動時
+// SEARCHMODE: 検索時(情報提供時)
+// FINISH: 全部のコメントを読み上げたという状態
+var states = {
+    STARTMODE: '_STARTMODE',
+    SEARCHMODE: '_SEARCHMODE',
+    FINISH: '_FINISH',
+}
+
 // このハンドラの定義が重要です
 // このハンドラがAlexaの動作を決めます。
-// 書き方はなんかイメージでいると思いますが
-// 
-//  'インテント名': 関数定義
-// ここで覚えることは、 emit で情報を送出すること
-// emit時のkeyは 
-// 
 var handlers = {
-    //　起動時のハンドラは LaunchRequest というハンドラインテント名
+    // ユーザーが、呼び出し名のみでスキルを呼び出し、
+    // インテントに対応するコマンドを言わなかった場合、
+    // サービスはLaunchRequestを受け取ります。
+    // 「Alexa,アニメトークイベントのお知らせを開いて」などの場合
     'LaunchRequest': function () {
-        // 起動時に指定したインテントがcallされるように設定する
-        this.emit(':ask', HELP_MESSAGE);
-        //this.emit('GreetingIntent');
+        // AnimeTalkEventInetnt へThrough します
+        this.emit('AnimeTalkEventInetnt');
     },
-    // 挨拶の動作コードを記載
-    'GreetingIntent': function(){
-        // 実行した時間毎に異なる挨拶を生成
-        var greet = getGreeting();
-        //　emit 時の key:
-        //  :tell は一問一答時に付与する
-        //  :ask は返答があることを期待するときに付与する
-        this.emit(':ask', greet);
+    // アニメトークイベントインテント
+    'AnimeTalkEventInetnt': function(){
+        if(this.handler.state === undefined){
+            // ステートを設定(一度説明を聞いた場合)
+            this.handler.state = states.SEARCHMODE;
+            // スキルの説明を実施
+            this.emit(':ask', LUNCH_MESSAGE)
+        }else if(this.handler.state === stats.STARTMODE){
+            // 終了ステータスを付与
+            this.handler.state = stats.FINISH;
+            // 検索を実施して応答文を生成
+            
+
+        }else if(this.handler.state === stats.FINISH){
+            // 終了の言葉を創出
+            this.emit('SessionEndedRequest')
+        }  
     },
-    // 以下は触らなくていいです。
+
+    // AMAZON.YESInentを利用して検索を開始するか確認する
+    'AMAZON.YesIntent': function(){
+        if(this.handler.state === states.SEARCHMODE){
+            this.emit('AnimeTalkEventInetnt');
+        };
+    },
+
     // ヘルプ動作にときに呼ばれるインテント
     'AMAZON.HelpIntent': function () {
         var speechOutput = HELP_MESSAGE;
@@ -93,38 +116,3 @@ var handlers = {
 	this.emit(':tell', STOP_MESSAGE);  
     }
 };
-
-//
-// 時間によって変わる挨拶を関数化
-// 早朝: 5~6時台 　　「朝早いですね、おはようございます。」
-// 朝：  7~11時台　　「おはようございます。」
-// 昼:   12～18時台  「こんににちは」
-// 夜:   19~0時台    「こんばんわ」
-// 深夜: 1~4時台     「夜遅くにこんばんわ」
-//
-// 注意) AWS のLambda のTimezoneを Asia/Tokyo に変更する場合は
-//      https://qiita.com/nullian/items/39ecf1f6d0194b72e8e6
-//      環境変数の設定で以下を設定する。
-//      key: TZ, Value: Asia/Tokyo
-function getGreeting(){
-    // AWS LambdaのTZの修正を実施したのでここのコードはもとに戻す。
-    // var dt = new Date();
-    // なんかLambdaの時刻がずれているので修正する
-    var timezoneoffset = -9;
-    var fakeUTC = new Date(Date.now() - (timezoneoffset * 60 - new Date().getTimezoneOffset()) * 60000);
-    var hours = fakeUTC.getHours();
-    var greet = undefined;
-    if(5 <= hours && hours <= 6){
-        // 早朝
-        greet = "朝早いですね、おはようございます。アレクサスキルゼミの参加者のみなさん";
-    }else if(7 <= hours && hours <= 11){
-        greet = "おはようございます,アレクサスキルゼミの参加者のみなさん。";
-    }else if(12 <= hours && hours <= 18){
-        greet = "こんにちは,アレクサスキルゼミの参加者のみなさん";
-    }else if(19 <= hours && hours <= 0){
-        greet = "こんばんわ,アレクサスキルゼミの参加者のみなさん";
-    }else{
-        greet = "夜遅くにこんばんわ,アレクサスキルゼミの参加者のみなさん";
-    }
-    return greet;
-}
