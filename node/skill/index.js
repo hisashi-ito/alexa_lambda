@@ -9,7 +9,7 @@
 //
 'use strict';
 const Alexa = require('ask-sdk-v1adapter');
-var export_function = require('scraping.js');
+var export_function = require('./scraping.js');
 var APP_ID = process.env.APP_ID // 注意) APP_ID はlambdaの環境変数経由でセットする
 var SKILL_NAME = "アニメトークイベントお知らせ";
 var LUNCH_MESSAGE = "アニメトークイベントお知らせスキルへようこそ。\
@@ -42,6 +42,8 @@ exports.handler = function(event, context, callback) {
     // これはもう定形なのでそうしてくださな。
     var alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
+    // アニメイベント情報を保存するDynamoDB
+    alexa.dynamoDBTableName = 'AnimeEventTable'; 
     // Alexaインスタンスへ直下で定義されたハンドラを登録します
     // このハンドラの実装および、ハンドラ自信がAlexaの動作を決めます。
     alexa.registerHandlers(handlers);
@@ -81,8 +83,13 @@ var handlers = {
         }else if(this.handler.state === stats.STARTMODE){
             // 終了ステータスを付与
             this.handler.state = stats.FINISH;
-            // 検索を実施して応答文を生成
-            
+            // 作成済みのevent情報が存在するか確認
+            if(this.attributes['event']){
+                
+            }else{
+                // 検索して保存
+                var event = ;
+            };
 
         }else if(this.handler.state === stats.FINISH){
             // 終了の言葉を創出
