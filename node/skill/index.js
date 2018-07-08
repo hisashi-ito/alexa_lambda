@@ -1,5 +1,3 @@
-import { S_IFLNK } from 'constants';
-
 //
 // 【AnimeTalkEvent lambda】
 //
