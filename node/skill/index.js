@@ -81,6 +81,8 @@ var handlers = {
 
     // アニメトークイベントインテント
     'AnimeTalkEventInetnt': function(){
+        this.emit(':tell', "test");
+
         // 現在時間情報
         var date = new Date() ;
         var x = date.getTime();
@@ -88,6 +90,7 @@ var handlers = {
         var event = undefined;
         if(this.attributes['state'] == states.LUNCH){
             // statesをSEARCHに設定する
+            this.attributes['state'] = states.SEARCH;
             this.emit(':ask', LUNCH_MESSAGE)
         }else if(this.attributes['state'] == states.SEARCH){
             // 終了ステータスを付与
@@ -107,6 +110,7 @@ var handlers = {
                 this.attributes['event'] = event;
                 this.attributes['time'] = utime;
             };
+
             // event 情報の読み上げ文字列を作成
             var msg = "";
             for(key in event){
@@ -117,9 +121,9 @@ var handlers = {
                     msg = msg + ary[0] + "\n" + ary[1];
                 }
             }
-            this.emit(':tell',msg);
             // statusを完了に変更
             this.attributes['state'] = states.FINISH;
+            this.emit(':tell',msg);
         }else if(this.attributes['state'] == states.FINISH){
             // 終了の言葉を創出
             this.emit('SessionEndedRequest')
@@ -128,11 +132,10 @@ var handlers = {
 
     // AMAZON.YESInentを利用して検索を開始するか確認する
     'AMAZON.YesIntent': function(){
-        if(this.attributes['state'] == states.LUNCH){
-            this.attributes['state'] = states.SEARCH;
+        if(this.attributes['state'] == states.SEARCH){
             this.emit('AnimeTalkEventInetnt');
         }else{
-            this.emit('LaunchRequest');           
+            this.emit('LaunchRequest');
         }
     },
 
