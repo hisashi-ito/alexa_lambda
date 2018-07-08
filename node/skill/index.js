@@ -56,12 +56,12 @@ exports.handler = function(event, context, callback) {
 
 // 大域変数を利用して内部状態を管理するためにSTATEを利用します
 // his.handler.state へ保存できる。
-// STARTMODE:  初回起動時
-// SEARCHMODE: 検索時(情報提供時)
+// START:  初回起動時
+// SEARCH: 検索時(情報提供時)
 // FINISH: 全部のコメントを読み上げたという状態
 var states = {
-    STARTMODE: '_STARTMODE',
-    SEARCHMODE: '_SEARCHMODE',
+    LUNCH: '_LUNCH',
+    SEARCH: '_SEARCH',
     FINISH: '_FINISH',
 }
 
@@ -73,6 +73,7 @@ var handlers = {
     // サービスはLaunchRequestを受け取ります。
     // 「Alexa,アニメトークイベントのお知らせを開いて」などの場合
     'LaunchRequest': function () {
+        this.handler.state = states.LUNCH;
         // AnimeTalkEventInetnt へThrough します
         this.emit('AnimeTalkEventInetnt');
     },
@@ -83,13 +84,10 @@ var handlers = {
         var x = date.getTime();
         var utime = Math.floor(x/1000);       
         var event = undefined;
-
-        if(this.handler.state === undefined){
-            // ステートを設定(一度説明を聞いた場合)
-            this.handler.state = states.SEARCHMODE;
-            // スキルの説明を実施
+        if(this.handler.state === states.LUNCH){
+            // statesをSEARCHに設定する
             this.emit(':ask', LUNCH_MESSAGE)
-        }else if(this.handler.state === states.STARTMODE){
+        }else if(this.handler.state === states.SEARCH){
             // 終了ステータスを付与
             this.handler.state = states.FINISH;
             // 作成済みのevent情報が存在するか確認
@@ -128,7 +126,8 @@ var handlers = {
 
     // AMAZON.YESInentを利用して検索を開始するか確認する
     'AMAZON.YesIntent': function(){
-        if(this.handler.state === states.SEARCHMODE){
+        if(this.handler.state === states.LUNCH){
+            this.handler.state = states.SEARCH;
             this.emit('AnimeTalkEventInetnt');
         };
     },
