@@ -66,6 +66,14 @@ var states = {
     FINISH: '_FINISH',
 }
 
+// 時間を取得する関数
+function getUtime(callback){
+    var date = new Date() ;
+    var x = date.getTime();
+    var utime = Math.floor(x/1000);       
+    var event = undefined;
+}
+
 // このハンドラの定義が重要です
 // このハンドラがAlexaの動作を決めます。
 var handlers = {
@@ -81,13 +89,15 @@ var handlers = {
 
     // アニメトークイベントインテント
     'AnimeTalkEventInetnt': function(){
-        this.emit(':tell', "test");
-
         // 現在時間情報
         var date = new Date() ;
         var x = date.getTime();
         var utime = Math.floor(x/1000);       
         var event = undefined;
+
+        // ここで返却
+        
+
         if(this.attributes['state'] == states.LUNCH){
             // statesをSEARCHに設定する
             this.attributes['state'] = states.SEARCH;
