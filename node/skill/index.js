@@ -44,7 +44,7 @@ exports.handler = function(event, context, callback) {
     // Alexaインスタンスは alexa という名前でインスタンス化されました。
     // これはもう定形なのでそうしてくださな。
     var alexa = Alexa.handler(event, context);
-    alexa.APP_ID = APP_ID;
+    alexa.appId = process.env.APP_ID;
     // アニメイベント情報を保存するDynamoDB
     alexa.dynamoDBTableName = 'AnimeEventTable'; 
     // Alexaインスタンスへ直下で定義されたハンドラを登録します
@@ -89,9 +89,9 @@ var handlers = {
             this.handler.state = states.SEARCHMODE;
             // スキルの説明を実施
             this.emit(':ask', LUNCH_MESSAGE)
-        }else if(this.handler.state === stats.STARTMODE){
+        }else if(this.handler.state === states.STARTMODE){
             // 終了ステータスを付与
-            this.handler.state = stats.FINISH;
+            this.handler.state = states.FINISH;
             // 作成済みのevent情報が存在するか確認
             if(this.attributes['event']){
                 if((utime - this.attributes["time"]) > INTERVAL_TIME){
@@ -119,8 +119,8 @@ var handlers = {
             }
             this.emit(':tell',msg);
             // statusを完了に変更
-            this.handler.state = stats.FINISH;
-        }else if(this.handler.state === stats.FINISH){
+            this.handler.state = states.FINISH;
+        }else if(this.handler.state === states.FINISH){
             // 終了の言葉を創出
             this.emit('SessionEndedRequest')
         }  
