@@ -6,7 +6,7 @@
 //
 //  更新履歴:
 //          2018.07.01 新規作成  
-//          2018.07.07 開発中
+//          2018.07.08 開発中
 //
 'use strict';
 const Alexa = require('ask-sdk-v1adapter');
@@ -15,7 +15,7 @@ var APP_ID = process.env.APP_ID // 注意) APP_ID はlambdaの環境変数経由
 var SKILL_NAME = "アニメトークイベントお知らせ";
 var LUNCH_MESSAGE = "アニメトークイベントお知らせスキルへようこそ。\
 このスキルではアニメトークイベントをチェックできます。\
-予定されているアニメトークイベントを知りたいですか？";
+予定されているアニメトークイベントを知りたいですか？　知りたい場合は「はい」と言ってください。";
 var HELP_MESSAGE = "アニメトークイベント情報を知りたい場合は、\
 「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。";
 var HELP_REPROMPT = "どうしますか？";
@@ -55,7 +55,8 @@ exports.handler = function(event, context, callback) {
 };
 
 // 大域変数を利用して内部状態を管理するためにSTATEを利用します
-// his.handler.state へ保存できる。
+// 状態変数を管理する場合は this.ttributes へ保存して動作を変更する
+// 
 // START:  初回起動時
 // SEARCH: 検索時(情報提供時)
 // FINISH: 全部のコメントを読み上げたという状態
@@ -73,10 +74,11 @@ var handlers = {
     // サービスはLaunchRequestを受け取ります。
     // 「Alexa,アニメトークイベントのお知らせを開いて」などの場合
     'LaunchRequest': function () {
-        this.handler.state = states.LUNCH;
+        this.attributes['state'] = states.LUNCH;
         // AnimeTalkEventInetnt へThrough します
         this.emit('AnimeTalkEventInetnt');
     },
+
     // アニメトークイベントインテント
     'AnimeTalkEventInetnt': function(){
         // 現在時間情報
@@ -84,12 +86,12 @@ var handlers = {
         var x = date.getTime();
         var utime = Math.floor(x/1000);       
         var event = undefined;
-        if(this.handler.state === states.LUNCH){
+        if(this.attributes['state'] == states.LUNCH){
             // statesをSEARCHに設定する
             this.emit(':ask', LUNCH_MESSAGE)
-        }else if(this.handler.state === states.SEARCH){
+        }else if(this.attributes['state'] == states.SEARCH){
             // 終了ステータスを付与
-            this.handler.state = states.FINISH;
+            this.attributes['state'] = states.FINISH;
             // 作成済みのevent情報が存在するか確認
             if(this.attributes['event']){
                 if((utime - this.attributes["time"]) > INTERVAL_TIME){
@@ -117,8 +119,8 @@ var handlers = {
             }
             this.emit(':tell',msg);
             // statusを完了に変更
-            this.handler.state = states.FINISH;
-        }else if(this.handler.state === states.FINISH){
+            this.attributes['state'] = states.FINISH;
+        }else if(this.attributes['state'] == states.FINISH){
             // 終了の言葉を創出
             this.emit('SessionEndedRequest')
         }  
@@ -126,10 +128,12 @@ var handlers = {
 
     // AMAZON.YESInentを利用して検索を開始するか確認する
     'AMAZON.YesIntent': function(){
-        if(this.handler.state === states.LUNCH){
-            this.handler.state = states.SEARCH;
+        if(this.attributes['state'] == states.LUNCH){
+            this.attributes['state'] = states.SEARCH;
             this.emit('AnimeTalkEventInetnt');
-        };
+        }else{
+            this.emit('LaunchRequest');           
+        }
     },
 
     // ヘルプ動作にときに呼ばれるインテント
