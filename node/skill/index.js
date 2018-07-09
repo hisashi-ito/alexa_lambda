@@ -66,13 +66,19 @@ var states = {
     FINISH: '_FINISH',
 }
 
-// 
-// 時間を取得する関数
-function getUtime(callback){
-    var date = new Date() ;
-    var x = date.getTime();
-    var utime = Math.floor(x/1000);       
-    var event = undefined;
+function getEventInfo(callback){
+    // var event = scraping.event_search();
+    callback();
+}
+
+function hoge(){
+    this.emit(':tell', "ほげほげ");
+}
+
+function setAttribute(value){
+    this.emit(":tell","ここ");
+    //this.attributes['event'] = event;
+    //this.attributes['time']  = utime;
 }
 
 // このハンドラの定義が重要です
@@ -112,10 +118,17 @@ var handlers = {
                     event = this.attributes['event'];
                 };
             }else{
-                // callback関数で記述しないといけない
                 // イベント情報を取得
+                //getEventInfo(function(){
+                //    hoge()
+                //});
+                //*/
+                hoge();
                 /*
-                event = scraping.event_search();
+                function event(callback){
+                    event = scraping.event_search();
+                    
+                }
                 this.attributes['event'] = event;
                 this.attributes['time'] = utime;
                 */

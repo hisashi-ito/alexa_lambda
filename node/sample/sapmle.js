@@ -40,3 +40,17 @@ step1(function(){
         })
     })
 });
+
+
+function getEventInfo(callback){
+    // var event = scraping.event_search();
+    callback();
+}
+function hoge(){
+    console.log("ほげほげ")
+    //this.emit(":tell", "ほげほげ")
+}
+
+getEventInfo(function(){
+    hoge()
+});
