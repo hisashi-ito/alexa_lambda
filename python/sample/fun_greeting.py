@@ -1,4 +1,4 @@
-python/fun_greeting.py# Alexa 用 AWS Lambda関数
+# Alexa 用 AWS Lambda関数
 '''
 FunGreeting (たのしい挨拶)　クラス
 '''
