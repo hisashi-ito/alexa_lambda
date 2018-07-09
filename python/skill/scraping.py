@@ -20,6 +20,28 @@ import sys
 sys.path.append('.')
 import mojimoji
 from bs4 import BeautifulSoup
+
+# 定数定義
+MAX_TITLE_LEN = 128
+MAX_BODY_LEN = 512
+
+# 記事判定用のキーワード集(メンテナンス必要)
+KEYWORDS = [
+    "アニメ","漫画","まんが",
+    "anime","新番組","監督",
+    "声優","せいゆう","アニメータ",
+    "作画","二次元","にじげん",
+    "プロデューサー","bd-box",
+    "ブルーレイ","blue-ray","box",
+    "blue","blueray","dvd",
+    "発売記念","イラスト","絵師"
+]
+
+# NGデータ
+NG_KEYWORDS = [
+    "エロ","18禁","sex","アダルト"
+]
+
 '''
 スクレイピングクラス
 '''
@@ -27,14 +49,16 @@ class Scraping(object):
     def __init__(self, urls):
         # 取得するデータのurlを配列で保存する
         self.urls = urls
-    def perform(self);
+
+    def perform(self):
         pass
 
-    '''
-    ロフトのデータを取得する
-    '''
+    # HTMLを取得する
+    def getHtml(self,url):
+        # 
+
     def loft(self):
-        
+        #     
 
 
     

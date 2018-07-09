@@ -20,4 +20,8 @@ HTTPリクエストライブラリ(htmlを取得します)
 $ pip3 install lxml -t ./
 ```
 HTMLパーサです。
-
+* fake-useragent
+```
+$ pip3 install fake-useragent
+```
+代表的なユーザエージェントを偽装するためのライブラリです。
