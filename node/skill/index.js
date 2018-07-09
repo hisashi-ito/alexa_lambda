@@ -66,6 +66,7 @@ var states = {
     FINISH: '_FINISH',
 }
 
+// 
 // 時間を取得する関数
 function getUtime(callback){
     var date = new Date() ;
@@ -94,10 +95,6 @@ var handlers = {
         var x = date.getTime();
         var utime = Math.floor(x/1000);       
         var event = undefined;
-
-        // ここで返却
-        
-
         if(this.attributes['state'] == states.LUNCH){
             // statesをSEARCHに設定する
             this.attributes['state'] = states.SEARCH;
@@ -115,12 +112,15 @@ var handlers = {
                     event = this.attributes['event'];
                 };
             }else{
+                // callback関数で記述しないといけない
                 // イベント情報を取得
+                /*
                 event = scraping.event_search();
                 this.attributes['event'] = event;
                 this.attributes['time'] = utime;
+                */
             };
-
+            /*
             // event 情報の読み上げ文字列を作成
             var msg = "";
             for(key in event){
@@ -134,10 +134,11 @@ var handlers = {
             // statusを完了に変更
             this.attributes['state'] = states.FINISH;
             this.emit(':tell',msg);
+            */
         }else if(this.attributes['state'] == states.FINISH){
             // 終了の言葉を創出
             this.emit('SessionEndedRequest')
-        }  
+        }
     },
 
     // AMAZON.YESInentを利用して検索を開始するか確認する
