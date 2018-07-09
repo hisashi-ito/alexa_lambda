@@ -9,4 +9,15 @@ pip3 install mojimoji -t ./
 ```
 pip3 install beautifulsoup4 -t ./
 ```
-pythonでHTMLのDOMを解析するために利用します。主に、スクレイピングとして利用します。
+pythonでHTMLのDOMを解析するために利用します。主に、スクレイピングとして利用します。  
+* requests
+```
+$ pip3 install requests -t ./
+```
+HTTPリクエストライブラリ(htmlを取得します)  
+* lxml
+```
+$ pip3 install lxml -t ./
+```
+HTMLパーサです。
+
