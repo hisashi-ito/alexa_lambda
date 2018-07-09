@@ -9,3 +9,4 @@ pip3 install mojimoji -t ./
 ```
 pip3 install beautifulsoup4 -t ./
 ```
+pythonでHTMLのDOMを解析するために利用します。主に、スクレイピングとして利用します。
