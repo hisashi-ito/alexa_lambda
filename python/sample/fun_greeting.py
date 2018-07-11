@@ -93,6 +93,10 @@ def welcome():
     text = "挨拶を聞きたいときは「挨拶の言葉をお願いします」,終わりたいときは「おしまい」と言ってください。どうしますか？"
     return QuestionSpeech(text).reprompt('よく聞こえませんでした').build()
 
+def nickname(name):
+    name = name + "ぽん"
+    return OneSpeech("あなたのあだ名は"+name).build()
+    
 # 時間によって挨拶を変更する
 def greeting():
     # 現在の時刻を取得する
@@ -130,7 +134,13 @@ def lambda_handler(event, context):
     elif request_type == 'IntentRequest':
         # インテント名を取得
         intent_name = request['intent']['name']
-  
+        if intent_name == "NicknameIntent" 
+           name = request['intent']["slots"]["FIRSTNAME"]["value"]
+           return nickname(name)
+        
+        if intent_name == "GreetingIntent":
+            return greeting()
+
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント
         if intent_name == 'AMAZON.HelpIntent':
