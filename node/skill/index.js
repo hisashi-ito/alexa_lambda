@@ -123,7 +123,7 @@ var handlers = {
                 //    hoge()
                 //});
                 //*/
-                hoge();
+                this.emit(":tell", "apple");
                 /*
                 function event(callback){
                     event = scraping.event_search();
