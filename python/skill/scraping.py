@@ -15,6 +15,7 @@
 #
 # 更新履歴:
 #         2018.07.09 node版からpython版へ移植した
+#         2018.07.14 実装を完了
 #
 import sys
 import re
@@ -77,10 +78,24 @@ class Scraping(object):
         text = text.lower()
         return text
 
+    # イベント判定
+    # NGキーワードに該当したらFalseを返却
+    # 目的のイベントにマッチすれがTrueを返却する
+    def _isAnime(self, text):
+        for kw in NG_KEYWORDS:
+            pat = re.compile(r'{}'.format(kw))
+            if re.search(pat, text):
+                return False
+        for kw in KEYWORDS:
+            pat = re.compile(r'{}'.format(kw))
+            if re.search(pat, text):
+                return True
+        return False
+                
     # HTMLを取得する
     def _getHtml(self,url):
         return requests.get(url, headers=self.header)
-        
+    
     def _loft(self, html):
         days = []
         titles = []
@@ -107,7 +122,9 @@ class Scraping(object):
         # 日付毎にloopしてイベント情報を保存する
         event = []
         for i in range(len(days)):
-            event.append([days[i], titles[i], bodies[i]])
+            # イベントor NG 判定を実施する
+            if self._isAnime(bodies[i]) or self._isAnime(titles[i]):
+                event.append([days[i], titles[i], bodies[i]])
         return event
 
 # 動作確認
