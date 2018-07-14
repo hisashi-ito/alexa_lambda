@@ -151,7 +151,6 @@ def lambda_handler(event, context):
         elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
             return bye()
 
-# debug
 if __name__ == '__main__' :
     request = {'type': 'LaunchRequest'}
     event = {'request': request}

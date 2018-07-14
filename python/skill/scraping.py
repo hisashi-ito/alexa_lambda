@@ -20,15 +20,14 @@
 import sys
 import re
 import requests
-sys.path.append('.')
+sys.path.append('./')
 import mojimoji
 from bs4 import BeautifulSoup
-import lxml.html
 from fake_useragent import UserAgent
 
 # 定数定義
 MAX_TITLE_LEN = 128
-MAX_BODY_LEN = 512
+# MAX_BODY_LEN = 512
 
 # 記事判定用のキーワード集(メンテナンス必要)
 KEYWORDS = [
@@ -77,7 +76,16 @@ class Scraping(object):
     def _normalize(self, text):
         # 改行を削除
         text = re.sub("\r?\n","", text)
+        text = mojimoji.zen_to_han(text, kana=False)
         text = text.lower()
+        return text
+    
+    # トリミング
+    # タイトルが指定された文字数以上の場合は
+    # 3文字削除して三点リーダー(...)とする
+    def _trim(self, text):
+        if len(text) >= (MAX_TITLE_LEN - 3):
+            text = text[0:MAX_TITLE_LEN - 3] + "..."
         return text
 
     # イベント判定
@@ -126,7 +134,8 @@ class Scraping(object):
         for i in range(len(days)):
             # イベントor NG 判定を実施する
             if self._isAnime(bodies[i]) or self._isAnime(titles[i]):
-                event.append([days[i], titles[i], bodies[i]])
+                # タイトル情報だけトリミングする。
+                event.append([days[i], self._trim(titles[i]), bodies[i]])
         return event
 
 # 動作確認
