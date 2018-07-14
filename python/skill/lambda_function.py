@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # AnimeTalkEvent Skill Lambda Function
+#
 import sys
 sys.path.append('./')
 from scraping import Scraping
@@ -15,13 +16,6 @@ HELP_MSG = "アニメトークイベント情報を知りたい場合は、\
 「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。"
 REPROMPT_MSG = "よく聞こえませんでした。イベント情報を知りたいですか？知りたい場合は「はい」と言ってください'"
 BYBY_MSG = "ご利用ありがとうございました。スキルを終了します。"
-
-# URL定義
-TARG_URLS = {
-    # keyがイベントの実親場所
-    "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
-    "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
-}
 
 class BaseSpeech:
     '''
@@ -111,7 +105,13 @@ def bye():
 
 # イベント情報取得
 def getInfos():
-    return Scraping(TARG_URLS)()
+    # URL定義
+    target_urls = {
+        # keyがイベントの実親場所
+        "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
+        "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
+    }
+    return Scraping(target_urls)()
 
 # 返却文字列を作成
 def speak(infos):
@@ -121,8 +121,9 @@ def speak(infos):
         for event in events:
             day = event[0]
             title = event[1]
-            msg += (day + " " + title)
-        msg += "\n"
+            msg += (day + " " + title + " ") 
+        msg += " "
+    msg += " 情報は以上となります。ご利用ありがとうございました。"
     return OneSpeech(msg).build()
 
 # Lambdaのmain関数
@@ -141,6 +142,7 @@ def lambda_handler(event, context):
         intent_name = request["intent"]["name"]
         if intent_name == 'AMAZON.YesIntent':
             return speak(getInfos())
+            #return speak(getInfos())
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
         elif intent_name == 'AMAZON.HelpIntent':

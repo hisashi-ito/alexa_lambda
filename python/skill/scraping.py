@@ -32,16 +32,19 @@ MAX_TITLE_LEN = 128
 # 記事判定用のキーワード集(メンテナンス必要)
 KEYWORDS = [
     "アニメ","漫画","まんが",
-    "anime","新番組","監督",
-    "声優","せいゆう","アニメータ",
+    "anime","新番組",
+    "声優","せいゆう",
     "作画","二次元","にじげん",
     "プロデューサー","bd-box",
-    "ブルーレイ","blue-ray","box",
-    "blue","blueray","dvd",
+    "ブルーレイ","blue-ray",
+    "blue","dvd",
     "発売記念","イラスト","絵師"
 ]
 # NGデータ
 NG_KEYWORDS = ["エロ","18禁","sex","アダルト"]
+
+# 最大個数
+MAX_EVENT_NUM = 2
 
 # スクレイピングクラス
 class Scraping(object):
@@ -116,6 +119,8 @@ class Scraping(object):
             day = a.p.text
             if not isinstance(day, str):
                 continue
+            # 月/日の表現を置換する
+            day = re.sub(r'\/',"月", day) + '日'
             days.append(self._normalize(day))
         # イベントタイトル
         for a in soup.find_all("div", attrs={"class": "event clearfix program1"}):
@@ -132,6 +137,9 @@ class Scraping(object):
         # 日付毎にloopしてイベント情報を保存する
         event = []
         for i in range(len(days)):
+            # 指定されたイベント数が確保できたら処理を停止
+            if len(event) >= MAX_EVENT_NUM:
+                return event
             # イベントor NG 判定を実施する
             if self._isAnime(bodies[i]) or self._isAnime(titles[i]):
                 # タイトル情報だけトリミングする。
