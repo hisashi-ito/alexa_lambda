@@ -46,8 +46,9 @@ NG_KEYWORDS = ["エロ","18禁","sex","アダルト"]
 
 # URL定義
 TARG_URLS = {
-    "ASAGAYA_LOFTT": "http://www.loft-prj.co.jp/schedule/lofta",
-    "LOFT_PLUS1": "http://www.loft-prj.co.jp/schedule/plusone",
+    # keyがイベントの実親場所
+    "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
+    "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
 }
 
 # スクレイピングクラス
@@ -59,15 +60,16 @@ class Scraping(object):
         # 取得するデータのurlを配列で保存する
         self.urls = urls
 
-    def perform(self):
-        ret = []
+    def __call__(self):
+        # 各イベント毎に処理する
+        ret = {}
         # 設定させているURLでループを回す
         for site, url in self.urls.items():
             html = self._getHtml(url)
             # URLの種別で呼び出すパーサを変更する
             if site == "ASAGAYA_LOFTT" or site == "LOFT_PLUS1":
                 # HTMLをparseする
-                ret.extend(self._loft(html))
+                ret[site] = self._loft(html)
         return ret
 
     # 文字列正規化
@@ -129,5 +131,5 @@ class Scraping(object):
 
 # 動作確認
 if __name__ == '__main__' :
-    s = Scraping(TARG_URLS).perform()
+    s = Scraping(TARG_URLS)()
     print(len(s))

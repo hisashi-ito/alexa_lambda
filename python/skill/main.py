@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # AnimeTalkEvent Skill Lambda Function
+import sys
+sys.path.append('./')
+from scraping import Scraping
+import boto3
 import datetime
 
 # セリフ一覧
@@ -11,6 +15,13 @@ HELP_MSG = "アニメトークイベント情報を知りたい場合は、\
 「イベント情報教えて」、本スキルを終了したいときは「終了」と言ってください。"
 REPROMPT_MSG = "よく聞こえませんでした。イベント情報を知りたいですか？知りたい場合は「はい」と言ってください'"
 BYBY_MSG = "ご利用ありがとうございました。スキルを終了します。"
+
+# URL定義
+TARG_URLS = {
+    # keyがイベントの実親場所
+    "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
+    "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
+}
 
 class BaseSpeech:
     '''
@@ -60,7 +71,6 @@ class BaseSpeech:
     def build(self):
         # 発話を実施するときに最後にこの関数をcallする
         return self._response
-
 '''
 OnSpeech
 一問一解に利用する。
@@ -97,7 +107,23 @@ def welcome():
 
 # スキル終了時
 def bye():
-    return OneSpeech(text).build()
+    return OneSpeech(BYBY_MSG).build()
+
+# イベント情報取得
+def getInfos():
+    return Scraping(TARG_URLS)()
+
+# 返却文字列を作成
+def speak(infos):
+    msg = ""
+    for site, events in infos.items():
+        msg += site + "の情報についてお知らせします。"
+        for event in events:
+            day = event[0]
+            title = event[1]
+            msg += (day + " " + title)
+        msg += "\n"
+    return OneSpeech(msg).build()
 
 # Lambdaのmain関数
 def lambda_handler(event, context):
@@ -113,31 +139,21 @@ def lambda_handler(event, context):
  
     # 何らかのインテントだった場合が検出された場合
     elif request_type == 'IntentRequest':
-        # インテント名を取得
         intent_name = request['intent']['name']
-        if intent_name == "NicknameIntent" 
-           name = request['intent']["slots"]["FIRSTNAME"]["value"]
-           return nickname(name)
-        
-        if intent_name == "GreetingIntent":
-            return greeting()
-
+        if intent_name == "AMAZON.YesIntent":
+            return speak(getInfos())
         # amazon が提供する組み込みインテント（ヘルプ）
-        # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント
-        if intent_name == 'AMAZON.HelpIntent':
+        # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
+        elif intent_name == 'AMAZON.HelpIntent':
             return welcome()
- 
         # amazon が提供する組み込みインテント（キャンセル、ストップ）
         # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
         elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
             return bye()
 
-
 # debug
 if __name__ == '__main__' :
     request = {'type': 'LaunchRequest'}
     event = {'request': request}
-    print(request)
-    print(event)
     res = lambda_handler(event, {})
     print(res)
