@@ -39,14 +39,14 @@ class BaseSpeech:
         # 最終的に返却するレスポンス内容。(dict)
         # 各メソッドで上書き・修正していく(結構乱暴な実装というか、ライブラリが提供されていない)
         self._response = {
-            'version': '1.0',
-            'sessionAttributes': session_attributes,
-            'response': {
-                'outputSpeech': {
-                    'type': 'PlainText',
-                    'text': speech_text
+            "version": "1.0",
+            "sessionAttributes": session_attributes,
+            "response": {
+                "outputSpeech": {
+                    "type": "PlainText",
+                    "text": speech_text
                 },
-                'shouldEndSession': should_end_session,
+                "shouldEndSession": should_end_session
             },
         } 
 
@@ -60,9 +60,9 @@ class BaseSpeech:
             text = self.speech_text
         card = {
             # シンプルカードを追加
-            'type': 'Simple',
-            'title': title,
-            'content': text,
+            "type": "Simple",
+            "title": title,
+            "content": text
         }
         # レスポインスハッシュに追加
         self._response['response']['card'] = card
@@ -93,12 +93,12 @@ class QuestionSpeech(BaseSpeech):
     def reprompt(self, text):
         """リプロンプトを追加する"""
         reprompt = {
-            'outputSpeech': {
-                'type': 'PlainText',
-                'text': text
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": text
             }
         }
-        self._response['response']['reprompt'] = reprompt
+        self._response["response"]["reprompt"] = reprompt
         return self
 
 # スキル起動時
@@ -128,19 +128,18 @@ def speak(infos):
 # Lambdaのmain関数
 def lambda_handler(event, context):
     # リクエストの種類を取得
-    request = event['request']
-    request_type = request['type']
+    request = event["request"]
+    request_type = request["type"]
 
     # LaunchRequestは、特定のインテントを提供することなく、ユーザーがスキルを呼び出すときに送信される...
     # つまり、「アレクサ、ハローワールドを開いて」のようなメッセージ
     # 「アレクサ、ハローワールドで挨拶しろ」と言うとこれはインテントを含むので、IntentRequestになる
-    if request_type == 'LaunchRequest':
+    if request_type == "LaunchRequest":
         return welcome()
- 
     # 何らかのインテントだった場合が検出された場合
-    elif request_type == 'IntentRequest':
-        intent_name = request['intent']['name']
-        if intent_name == "AMAZON.YesIntent":
+    elif request_type == "IntentRequest":
+        intent_name = request["intent"]["name"]
+        if intent_name == 'AMAZON.YesIntent':
             return speak(getInfos())
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
@@ -152,7 +151,11 @@ def lambda_handler(event, context):
             return bye()
 
 if __name__ == '__main__' :
-    request = {'type': 'LaunchRequest'}
-    event = {'request': request}
+    import json
+    request = {
+        "type": "IntentRequest",
+        "intent": {"name": 'AMAZON.YesIntent'}
+    }
+    event = {"request": request}
     res = lambda_handler(event, {})
     print(res)

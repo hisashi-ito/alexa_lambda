@@ -21,7 +21,7 @@ import sys
 import re
 import requests
 sys.path.append('./')
-# import mojimoji
+#import mojimoji
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -67,9 +67,14 @@ class Scraping(object):
     # 文字列正規化
     # 改行コードを削除して、英語を小文字化する
     def _normalize(self, text):
-        # 改行を削除
+        # 不要な文字列をきれいに削除
+        text = text.strip()
+        text = re.sub(r'\'|\"',"", text)
         text = re.sub("\r?\n","", text)
-        # text = mojimoji.zen_to_han(text, kana=False)
+        text = re.sub("　"," ", text)
+        text = re.sub(r'【|】|[|]|「|」|『|』',"", text)
+        text = re.sub(r'：'," ", text)
+        text = text.replace(u'\xa0', ' ')
         text = text.lower()
         return text
     
@@ -97,8 +102,10 @@ class Scraping(object):
                 
     # HTMLを取得する
     def _getHtml(self,url):
-        return requests.get(url, headers=self.header)
-    
+        response = requests.get(url, headers=self.header)
+        response.encoding = response.apparent_encoding
+        return response
+        s
     def _loft(self, html):
         days = []
         titles = []

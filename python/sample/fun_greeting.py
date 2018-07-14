@@ -134,7 +134,7 @@ def lambda_handler(event, context):
     elif request_type == 'IntentRequest':
         # インテント名を取得
         intent_name = request['intent']['name']
-        if intent_name == "NicknameIntent" 
+        if intent_name == "NicknameIntent":
            name = request['intent']["slots"]["FIRSTNAME"]["value"]
            return nickname(name)
         
