@@ -21,7 +21,7 @@ import sys
 import re
 import requests
 sys.path.append('./')
-import mojimoji
+# import mojimoji
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -43,13 +43,6 @@ KEYWORDS = [
 # NGデータ
 NG_KEYWORDS = ["エロ","18禁","sex","アダルト"]
 
-# URL定義
-TARG_URLS = {
-    # keyがイベントの実親場所
-    "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
-    "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
-}
-
 # スクレイピングクラス
 class Scraping(object):
     def __init__(self, urls):
@@ -62,11 +55,11 @@ class Scraping(object):
     def __call__(self):
         # 各イベント毎に処理する
         ret = {}
-        # 設定させているURLでループを回す
+        # 設定させているURLでループを回すc
         for site, url in self.urls.items():
             html = self._getHtml(url)
             # URLの種別で呼び出すパーサを変更する
-            if site == "ASAGAYA_LOFTT" or site == "LOFT_PLUS1":
+            if site == "阿佐ヶ谷ロフト" or site == "ロフトプラスワン":
                 # HTMLをparseする
                 ret[site] = self._loft(html)
         return ret
@@ -76,7 +69,7 @@ class Scraping(object):
     def _normalize(self, text):
         # 改行を削除
         text = re.sub("\r?\n","", text)
-        text = mojimoji.zen_to_han(text, kana=False)
+        # text = mojimoji.zen_to_han(text, kana=False)
         text = text.lower()
         return text
     
@@ -140,5 +133,11 @@ class Scraping(object):
 
 # 動作確認
 if __name__ == '__main__' :
+    # URL定義
+    TARG_URLS = {
+        # keyがイベントの実親場所
+        "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
+        "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone"
+    }
     s = Scraping(TARG_URLS)()
-    print(len(s))
+    print(s)
