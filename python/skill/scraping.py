@@ -27,14 +27,13 @@ from fake_useragent import UserAgent
 
 # 定数定義
 MAX_TITLE_LEN = 128
-# MAX_BODY_LEN = 512
 
 # 記事判定用のキーワード集(メンテナンス必要)
 KEYWORDS = [
     "アニメ","漫画","まんが",
     "anime","新番組",
     "声優","せいゆう",
-    "作画","二次元","にじげん",
+    "作画","二次元",
     "プロデューサー","bd-box",
     "ブルーレイ","blue-ray",
     "blue","dvd",
@@ -44,8 +43,7 @@ KEYWORDS = [
 NG_KEYWORDS = ["エロ","18禁","sex","アダルト"]
 
 # 最大個数
-MAX_EVENT_NUM = 2
-
+MAX_EVENT_NUM = 3
 # スクレイピングクラス
 class Scraping(object):
     def __init__(self, urls):
@@ -90,25 +88,28 @@ class Scraping(object):
         return text
 
     # イベント判定
-    # NGキーワードに該当したらFalseを返却
-    # 目的のイベントにマッチすれがTrueを返却する
+    # (ここが遅いのでちゃんと検討する)
+    # 最初にアニメ判定を実施。
+    # その後にそれがNGかどうかだけを判定する。
     def _isAnime(self, text):
-        for kw in NG_KEYWORDS:
-            pat = re.compile(r'{}'.format(kw))
-            if re.search(pat, text):
-                return False
         for kw in KEYWORDS:
             pat = re.compile(r'{}'.format(kw))
             if re.search(pat, text):
+                for ng_kw in NG_KEYWORDS:
+                    ng = re.compile(r'{}'.format(ng_kw))
+                    if re.search(ng, text):
+                        return False
                 return True
+        # KEYWORDSにマッチしなかったら
+        # 通常イベント(処理対象外)
         return False
-                
+
     # HTMLを取得する
     def _getHtml(self,url):
         response = requests.get(url, headers=self.header)
         response.encoding = response.apparent_encoding
         return response
-        s
+
     def _loft(self, html):
         days = []
         titles = []

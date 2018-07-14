@@ -105,13 +105,13 @@ def bye():
 
 # イベント情報取得
 def getInfos():
-    # URL定義
-    target_urls = {
-        # keyがイベントの実親場所
+    # 調査するURL集合
+    urls = {
         "阿佐ヶ谷ロフト": "http://www.loft-prj.co.jp/schedule/lofta",
         "ロフトプラスワン": "http://www.loft-prj.co.jp/schedule/plusone",
     }
-    return Scraping(target_urls)()
+    # scraping classにURL'sを渡して__call__関数で抽出処理を実施する
+    return Scraping(urls)()
 
 # 返却文字列を作成
 def speak(infos):
@@ -142,7 +142,6 @@ def lambda_handler(event, context):
         intent_name = request["intent"]["name"]
         if intent_name == 'AMAZON.YesIntent':
             return speak(getInfos())
-            #return speak(getInfos())
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
         elif intent_name == 'AMAZON.HelpIntent':
