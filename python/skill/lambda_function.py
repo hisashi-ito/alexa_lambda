@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 # AnimeTalkEvent Skill Lambda Function
 #
+#　更新履歴:
+#          2018.07.14 新規作成
+#
+import os
 import sys
 sys.path.append('./')
 from scraping import Scraping
@@ -128,6 +132,11 @@ def speak(infos):
 
 # Lambdaのmain関数
 def lambda_handler(event, context):
+    # 環境変数経由でAPP_ID を取得し、APP_IDが異なる場合は処理を終了
+    app_id = os.environ['APP_ID']
+    if event['session']['application']['applicationId'] != app_id:
+        raise ValueError("Invalid Application ID")
+
     # リクエストの種類を取得
     request = event["request"]
     request_type = request["type"]
