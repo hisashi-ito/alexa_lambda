@@ -4,6 +4,7 @@
 #
 #　更新履歴:
 #          2018.07.14 新規作成
+#          2018.07.21 修正依頼があったので修正します
 #
 import os
 import sys
@@ -149,7 +150,7 @@ def lambda_handler(event, context):
     # 何らかのインテントだった場合が検出された場合
     elif request_type == "IntentRequest":
         intent_name = request["intent"]["name"]
-        if intent_name == 'AMAZON.YesIntent':
+        if intent_name == 'AMAZON.YesIntent' or intent_name == 'AnimeTalkEventInetnt':
             return speak(getInfos())
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
@@ -157,7 +158,7 @@ def lambda_handler(event, context):
             return welcome()
         # amazon が提供する組み込みインテント（キャンセル、ストップ）
         # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
-        elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent':
+        elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent' or intent_name == 'AMAZON.NoIntent':
             return bye()
 
 if __name__ == '__main__' :
