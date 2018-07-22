@@ -8,7 +8,6 @@
 #
 #　更新履歴:
 #          2018.07.22 新規作成
-# 
 import os
 import sys
 import random
@@ -112,7 +111,7 @@ class EngVoc(object):
         f = open("./voc/eng_voc.csv", "r")
         for line in f:
             elems = line.rstrip().split(',')
-            voc.append(elems[0])
+            EngVoc.voc.append(elems[0])
         f.close()
 
 # スキル起動時の発話
@@ -165,14 +164,12 @@ def lambda_handler(event, context):
     request_type = request["type"]
     session = event['session']
     session_attributes = session.get('attributes', {})
-    item = request["intent"]['slots']['']['value']
 
     # LaunchRequestは、特定のインテントを提供することなく、ユーザーがスキルを呼び出すときに送信される...
     # つまり、「アレクサ、ハローワールドを開いて」のようなメッセージ
     # 「アレクサ、ハローワールドで挨拶しろ」と言うとこれはインテントを含むので、IntentRequestになる
     if request_type == "LaunchRequest":
         return welcome()
-
     # 何らかのインテントだった場合が検出された場合
     elif request_type == "IntentRequest":
         intent_name = request["intent"]["name"]
@@ -182,15 +179,8 @@ def lambda_handler(event, context):
             # slot に voc が存在する場合はあっているか確認する。
             voc = request["intent"]["slots"]["EngVoc"]
             return voc_recognition(voc, session_attributes)
-        else:
-            pass
-
-
-        
-
-'''
-
-
+        elif intent_name == "NextIntent":
+            return lesson(session_attributes, eng_voc)
         # amazon が提供する組み込みインテント（ヘルプ）
         # 「ヘルプ」「どうすればいいの」「使い方を教えて」で呼ばれる、組み込みインテント        
         elif intent_name == 'AMAZON.HelpIntent':
@@ -199,14 +189,14 @@ def lambda_handler(event, context):
         # 「キャンセル」「取り消し」「やっぱりやめる」等で呼び出される。組み込みのインテント
         elif intent_name == 'AMAZON.CancelIntent' or intent_name == 'AMAZON.StopIntent' or intent_name == 'AMAZON.NoIntent':
             return bye()
-'''
 
 if __name__ == '__main__' :
     import json
     request = {
-        "type": "IntentRequest",
-        "intent": {"name": 'AMAZON.YesIntent'}
+        "type": "LaunchRequest"
     }
-    event = {"request": request}
-    res = lambda_handler(event, {})
-    print(res)
+    event = {
+        "request": request,
+        "session": {"application":{"applicationId": os.environ['APP_ID']}}
+    }
+    print(lambda_handler(event, {}))
