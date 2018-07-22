@@ -44,7 +44,6 @@ class BaseSpeech:
                 "shouldEndSession": should_end_session
             },
         } 
-
         # インスタンス変数に一時変数を用意しておく
         self.speech_text = speech_text
         self.should_end_session = should_end_session
@@ -65,8 +64,6 @@ class BaseSpeech:
     def build(self):
         # 発話を実施するときに最後にこの関数をcallする
         return self._response
-
-
 
 '''
 OnSpeech
