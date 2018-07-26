@@ -11,13 +11,14 @@
 import os
 import sys
 import random
+import copy
 sys.path.append('./')
-# alexaセリフ
-WELLCOME_MSG = "英単語発音教室スキルへようこそ、このスキルでは英単語の発音が正しいかを判定することでできます。英単語の発音練習を初めますか？ \
+# "えいたん" のセリフ
+WELLCOME_MSG = "えいたん スキルへようこそ、このスキルでは英単語の発音が正しいかを判定することでできます。英単語の発音練習を初めますか？ \
 練習を初める場合は「練習を開始」とおっしゃってください。"
-HELP_MSG     = "英単語の学習を始める場合は「発音練習を初める」言ってください。本スキルを終了したいときは「終了」と言ってください。"
-REPROMPT_MSG = "よく聞こえませんでした。もう一度おっしゃってください。"
-BYBY_MSG     = "ご利用ありがとうございました。スキルを終了します。"
+HELP_MSG     = "英単語の学習を始める場合は「発音練習をはじめる」言ってください。本スキルを終了したいときは「終了」と言ってください。"
+REPROMPT_MSG = "よく聞こえませんでした。もう一度お願いします"
+BYBY_MSG     = "ご利用ありがとうございました。えいたん スキルを終了します。"
 
 class BaseSpeech:
     '''
@@ -97,7 +98,7 @@ class QuestionSpeech(BaseSpeech):
         return self
 
 '''
-語彙保存用クラス
+英単語保存用クラス
 '''
 class EngVoc(object):
     voc = []
@@ -105,10 +106,13 @@ class EngVoc(object):
         self._load_voc()
 
     def _load_voc(self):
-        # 指定された語彙ファイルを読み込んでクラス変数に登録ファイル名は固定とする。
+        # 指定された英単語ファイルを読み込んでクラス変数に登録する。
+        # 読み込むファイル名は固定です。
         f = open("./voc/eng_voc.csv", "r")
         for line in f:
             elems = line.rstrip().split(',')
+            # alexa スキルのslotと同じものを利用する。そのために
+            # 語彙,IDの順番に記載されている。vocはクラス変数
             EngVoc.voc.append(elems[0])
         f.close()
 
@@ -117,7 +121,7 @@ def welcome():
     return QuestionSpeech(WELLCOME_MSG).reprompt(REPROMPT_MSG).build()
 
 # 英語単語学習の開始時の発話すでに出題した単語などの情報をsession_attributesに保存されている
-def lesson(session_attributes, eng_voc):
+def lesson(session_attributes, eng_voc, msg = ""):
     tested = session_attributes.get("tested",{})
     # 語彙リストの中からランダムに情報を取得する
     v = ""
@@ -126,26 +130,36 @@ def lesson(session_attributes, eng_voc):
         if not v in tested:
             break
     tested[v] = 1
-    session_attributes["tested"] = tested
-    session_attributes["test"] = v
+    session_attributes["tested"] = copy.deepcopy(tested)
+    session_attributes["test"]   = v
+    # session_attributesに対話状態をもたせておく今は、テスト中
+    session_attributes["status"] = "try"
     # 文字列を生成して発話を促すその場合に
     # テスト済みの単語を session_attributes　に保存しておく
-    msg = v + " と発話としてください"
+    if len(msg) == 0:
+        msg = v + " と発話してください"
+    else:
+        msg = msg + " 次は" + v + " と発話してください"       
     return QuestionSpeech(msg, session_attributes).build()
+
 
 # 正解かどうかの判定
 def voc_recognition(voc, session_attributes):
     if session_attributes["test"] == voc:
-        msg = "グッド! よい発音です"
+        session_attributes["status"] = "next"
+        msg = "グッド！　うまく認識できました。"
+        lesson(session_attributes, eng_voc):
     else:
-        msg = "バッド! うまく認識できませんでした"
-    return QuestionSpeech(msg).build()
+        msg = "バッド! うまく認識できませんでした。もう一度、発話してください"
+        session_attributes["status"] = "next"
+    return QuestionSpeech(msg, session_attributes).build()
 
 # スキル終了時の発話
 def bye():
     return OneSpeech(BYBY_MSG).build()
 
 # Lambdaのmain関数
+# この関数配下に記載する
 def lambda_handler(event, context):
     # 環境変数経由でAPP_ID を取得し、APP_IDが異なる場合は処理を終了
     app_id = os.environ['APP_ID']
@@ -167,16 +181,25 @@ def lambda_handler(event, context):
     # つまり、「アレクサ、ハローワールドを開いて」のようなメッセージ
     # 「アレクサ、ハローワールドで挨拶しろ」と言うとこれはインテントを含むので、IntentRequestになる
     if request_type == "LaunchRequest":
+        # えいたん スキルへようこそ、このスキルでは英単語の発音が正し・・・
         return welcome()
+
     # 何らかのインテントだった場合が検出された場合
     elif request_type == "IntentRequest":
         intent_name = request["intent"]["name"]
+
+        # 練習開始
         if intent_name == "LessonStartIntent":
+            # 練習開始!
             return lesson(session_attributes, eng_voc)
+
+        # 認識処理
         elif intent_name == "EngVocRecIntent":
             # slot に voc が存在する場合はあっているか確認する。
             voc = request["intent"]["slots"]["EngVoc"]
             return voc_recognition(voc, session_attributes)
+
+
         elif intent_name == "NextIntent":
             return lesson(session_attributes, eng_voc)
         # amazon が提供する組み込みインテント（ヘルプ）
