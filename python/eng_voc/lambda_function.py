@@ -121,6 +121,8 @@ def welcome():
     return QuestionSpeech(WELLCOME_MSG).reprompt(REPROMPT_MSG).build()
 
 # 英語単語学習の開始時の発話すでに出題した単語などの情報をsession_attributesに保存されている
+# 引数に msg を追加した。msg は呼び出しもとから
+# 「正解です次は〜」みたいな継続情報を上から入れたい！
 def lesson(session_attributes, eng_voc, msg = ""):
     tested = session_attributes.get("tested",{})
     # 語彙リストの中からランダムに情報を取得する
@@ -137,11 +139,10 @@ def lesson(session_attributes, eng_voc, msg = ""):
     # 文字列を生成して発話を促すその場合に
     # テスト済みの単語を session_attributes　に保存しておく
     if len(msg) == 0:
-        msg = v + " と発話してください"
+        msg = v + " と発話してください。"
     else:
-        msg = msg + " 次は" + v + " と発話してください"       
+        msg = msg + " 次は" + v + " と発話してください。"       
     return QuestionSpeech(msg, session_attributes).build()
-
 
 # 正解かどうかの判定
 def voc_recognition(voc, session_attributes):
@@ -190,8 +191,9 @@ def lambda_handler(event, context):
 
         # 練習開始
         if intent_name == "LessonStartIntent":
-            # 練習開始!
-            return lesson(session_attributes, eng_voc)
+            # 練習開始! (msgは空文字で実行)
+            session_attributes["status"] = "try"
+            return lesson(session_attributes, eng_voc, msg="")
 
         # 認識処理
         elif intent_name == "EngVocRecIntent":
